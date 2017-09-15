@@ -79,7 +79,7 @@ Credit : This android library use [Autobahn-java](https://github.com/crossbario/
  ### 3 - Close Connection and remove listners
  ```java
  ws.end();
- `
+
  
 License
 -------
