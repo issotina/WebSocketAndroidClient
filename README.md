@@ -75,6 +75,12 @@ Credit : This android library use [Autobahn-java](https://github.com/crossbario/
  ```java
  ws.send("path/to/channel","Hello Channel");
  ```
+ 
+ ### 3 - Close Connection and remove listners
+ ```java
+ ws.end();
+ `
+ 
 License
 -------
 
