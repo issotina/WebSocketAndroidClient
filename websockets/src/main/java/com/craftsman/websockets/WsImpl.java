@@ -18,7 +18,7 @@ public class WsImpl implements Ws {
 
     final String TAG = "Web Socket Impl";
 
-    final AutobahnConnection autobahnConnection = new AutobahnConnection();
+    AutobahnConnection autobahnConnection = new AutobahnConnection();
     final List<Payload> subscriptions = new ArrayList<>();
     String serverUrl;
 
@@ -103,13 +103,29 @@ public class WsImpl implements Ws {
     }
 
     @Override
-    public void send(String channelPath, String text) {
-
+    public void send( String text) {
+        if(autobahnConnection.isConnected())
+            autobahnConnection.sendTextMessage(text);
     }
 
     @Override
-    public void send(String channelPath, byte[] binary) {
+    public void send( byte[] binary) {
+        if(autobahnConnection.isConnected())
+            autobahnConnection.sendBinaryMessage(binary);
+    }
 
+    @Override
+    public void send(String channelPath, Object o) {
+        if(autobahnConnection.isConnected())
+            autobahnConnection.publish(channelPath,o);
+    }
+
+    @Override
+    public void end() {
+        if(autobahnConnection != null && autobahnConnection.isConnected()) {
+            autobahnConnection.unsubscribe();
+            autobahnConnection = null;
+        }
     }
 
     final private class Payload<T>{
