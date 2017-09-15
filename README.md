@@ -16,7 +16,7 @@ Credit : This android library use [Autobahn-java](https://github.com/crossbario/
  ### 2 - Add the dependency
  ```groovy
  dependencies {
-	        compile 'com.github.geeckmc:WebSocketAndroidClient:0.0.2'
+	        compile 'com.github.geeckmc:WebSocketAndroidClient:0.0.4'
 	}
 ```
  
