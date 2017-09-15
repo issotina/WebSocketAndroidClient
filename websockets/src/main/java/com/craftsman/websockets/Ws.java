@@ -31,18 +31,30 @@ public interface Ws {
 
     /**
      *
-     * @param channelPath
      * @param text
      */
-    void send(String channelPath,String text);
+    void send(String text);
+
+
+    /**
+     *
+     * @param binary
+     */
+    void send(byte[] binary);
 
 
     /**
      *
      * @param channelPath
-     * @param binary
+     * @param o
      */
-    void send(String channelPath,byte[] binary);
+    void send(String channelPath,Object o);
+
+
+    /**
+     *
+     */
+    void end();
 
     /**
      *
