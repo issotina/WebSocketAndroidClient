@@ -16,7 +16,7 @@ Credit : This android library use [Autobahn-java](https://github.com/crossbario/
  ### 2 - Add the dependency
  ```groovy
  dependencies {
-	        compile 'com.github.geeckmc:WebSocketAndroidClient:0.0.1'
+	        compile 'com.github.geeckmc:WebSocketAndroidClient:0.0.2'
 	}
 ```
  
@@ -65,7 +65,16 @@ Credit : This android library use [Autobahn-java](https://github.com/crossbario/
             }
         });
 ```
+### 2 - Send data to server
 
+ ```java 
+ ws.send("Hello World");
+ ```
+ or send to specific channel
+ 
+ ```java
+ ws.send("path/to/channel","Hello Channel");
+ ```
 License
 -------
 
