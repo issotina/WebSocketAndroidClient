@@ -62,6 +62,11 @@ public class WsImpl implements Ws {
             @Override
             public void onClose(int i, String s) {
                 Log.i(TAG,"Disconnected");
+                try {
+                    connect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
         return this;
