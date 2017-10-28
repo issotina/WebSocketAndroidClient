@@ -58,12 +58,12 @@ public class WsImpl implements Ws {
                     });
                 }
             }
-
             @Override
             public void onClose(int i, String s) {
+                //force recnnection to web socket
                 Log.i(TAG,"Disconnected");
                 try {
-                    connect();
+                  if(!autobahnConnection.isConnected()) connect();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
