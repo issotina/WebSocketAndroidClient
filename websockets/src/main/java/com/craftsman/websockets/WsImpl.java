@@ -63,7 +63,8 @@ public class WsImpl implements Ws {
                 //force recnnection to web socket
                 Log.i(TAG,"Disconnected");
                 try {
-                  if(!autobahnConnection.isConnected()) connect();
+                  if(i == 1 || i == 3)
+                      connect();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -129,6 +130,7 @@ public class WsImpl implements Ws {
     public void end() {
         if(autobahnConnection != null && autobahnConnection.isConnected()) {
             autobahnConnection.unsubscribe();
+            autobahnConnection.disconnect();
             autobahnConnection = null;
         }
     }
@@ -137,8 +139,6 @@ public class WsImpl implements Ws {
         String channel;
         Class<T> objectType;
         WsListner listner;
-
-
 
         public Payload(String channel, Class<T> objectType, WsListner listner) {
             this.channel = channel;
