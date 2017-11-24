@@ -1,16 +1,16 @@
 package com.craftsman.websockets;
 
-/**
- * Created by ALI SHADAÏ (Software Craftman) on 15/09/2017.
- */
 
+import java.util.List;
+
+@SuppressWarnings("JavaDoc")
 public interface Ws {
 
     /**
      *
      * @return
      */
-     Ws connect() throws Exception;
+    Ws connect() throws Exception;
 
 
     /**
@@ -18,7 +18,7 @@ public interface Ws {
      * @param channelPath
      * @param wsListner
      */
-    <T> Ws on(String channelPath,Class<T> exceptedDataType, WsListner<T> wsListner);
+    <T> Ws on(String channelPath, Class<T> exceptedDataType, WsListner<T> wsListner);
 
 
     /**
@@ -27,7 +27,15 @@ public interface Ws {
      * @param wsListner
      * @return
      */
-     Ws on(String channelPath, WsListner wsListner);
+    Ws on(String channelPath, WsListner wsListner);
+
+    /**
+     * @param channelPath
+     * @return
+     */
+    Ws unsubscribe(String channelPath);
+
+    Ws unsubscribe(List<String> channelPath);
 
     /**
      *
@@ -48,7 +56,7 @@ public interface Ws {
      * @param channelPath
      * @param o
      */
-    void send(String channelPath,Object o);
+    void send(String channelPath, Object o);
 
 
     /**
@@ -61,7 +69,7 @@ public interface Ws {
      */
     interface WsListner<T> {
 
-        void onEvent(String eventUri,T data);
+        void onEvent(String eventUri, T data);
     }
 
 

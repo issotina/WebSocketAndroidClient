@@ -1,8 +1,11 @@
 package com.craftsman.websockets;
 
+import android.os.Handler;
 import android.util.Log;
 
 import com.google.gson.Gson;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,22 +13,51 @@ import java.util.List;
 import de.tavendo.autobahn.Autobahn;
 import de.tavendo.autobahn.AutobahnConnection;
 
-/**
- * Created by ALI SHADAÏ (Software Craftman) on 15/09/2017.
- */
-
+@SuppressWarnings("unchecked")
 public class WsImpl implements Ws {
+    private final String TAG = "Web Socket Impl";
+    private final List<Payload> subscriptions = new ArrayList<>();
+    private Handler mainHandler = new Handler();
+    private AutobahnConnection autobahnConnection = new AutobahnConnection();
+    private String serverUrl;
+    private Runnable handleSocketReconnection = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                if (autobahnConnection != null && !autobahnConnection.isConnected())
+                    connect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
-    final String TAG = "Web Socket Impl";
-
-    AutobahnConnection autobahnConnection = new AutobahnConnection();
-    final List<Payload> subscriptions = new ArrayList<>();
-    String serverUrl;
-
-    public WsImpl(String websocketServerUri) {
+    WsImpl(String websocketServerUri) {
         serverUrl = websocketServerUri;
     }
 
+    public void changeSocketURI(String host, String port) throws Exception {
+
+        if (serverUrl != null && !serverUrl.isEmpty()) {
+
+            if (autobahnConnection != null && autobahnConnection.isConnected()) {
+                end();
+            }
+
+            String[] spliter = serverUrl.split(":");
+            if (host != null && !host.isEmpty()) {
+                spliter[1] = "//" + host;
+            }
+
+            if (port != null && !port.isEmpty()) {
+                spliter[2] = port;
+            }
+
+            serverUrl = StringUtils.join(spliter, ":");
+
+            connect();
+        }
+    }
 
     @Override
     public Ws connect() throws Exception {
@@ -49,7 +81,6 @@ public class WsImpl implements Ws {
                                         (payload.objectType != null) ?
                                                 new Gson().fromJson(o.toString(),payload.objectType)
                                                  : o);
-
                             }
                             catch (Exception e){
                                 e.printStackTrace();
@@ -61,12 +92,11 @@ public class WsImpl implements Ws {
             @Override
             public void onClose(int i, String s) {
                 //force recnnection to web socket
-                Log.i(TAG,"Disconnected");
-                try {
-                  if(i == 1 || i == 3)
-                      connect();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                Log.i(TAG, "Disconnected; Code " + i);
+
+                if (i == 1 || i == 3 || i == 2 || i == 4 || i == 5) {
+                    mainHandler.removeCallbacks(handleSocketReconnection);
+                    mainHandler.postDelayed(handleSocketReconnection, 15000);
                 }
             }
         });
@@ -75,9 +105,9 @@ public class WsImpl implements Ws {
 
     @Override
     public <T> Ws on(final String channelPath, final Class<T> exceptedDataType, final WsListner<T> wsListner) {
+        subscriptions.add(new Payload<>(channelPath, exceptedDataType, wsListner));
 
-        if(!autobahnConnection.isConnected()){
-            subscriptions.add(new Payload<>(channelPath,exceptedDataType,wsListner));
+        if (!autobahnConnection.isConnected()) {
             return this;
         }
         else {
@@ -92,10 +122,11 @@ public class WsImpl implements Ws {
         return this;
     }
 
+
     @Override
     public Ws on(String channelPath, final WsListner wsListner) {
-        if(!autobahnConnection.isConnected()){
-            subscriptions.add(new Payload<>(channelPath,null,wsListner));
+        subscriptions.add(new Payload<>(channelPath, null, wsListner));
+        if (!autobahnConnection.isConnected()) {
             return this;
         }
         else autobahnConnection.subscribe(channelPath, Object.class, new Autobahn.EventHandler() {
@@ -105,6 +136,29 @@ public class WsImpl implements Ws {
             }
         });
 
+        return this;
+    }
+
+    @Override
+    public Ws unsubscribe(String channelPath) {
+        for (Payload payload : subscriptions) {
+            if (StringUtils.equals(payload.channel, channelPath)) {
+                if (autobahnConnection != null) {
+                    if (autobahnConnection.isConnected())
+                        autobahnConnection.unsubscribe(channelPath);
+
+                    subscriptions.remove(payload);
+                }
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public Ws unsubscribe(List<String> channelPath) {
+        for (String payload : channelPath) {
+            unsubscribe(payload);
+        }
         return this;
     }
 
@@ -131,16 +185,15 @@ public class WsImpl implements Ws {
         if(autobahnConnection != null && autobahnConnection.isConnected()) {
             autobahnConnection.unsubscribe();
             autobahnConnection.disconnect();
-            autobahnConnection = null;
         }
     }
 
     final private class Payload<T>{
-        String channel;
-        Class<T> objectType;
-        WsListner listner;
+        private String channel;
+        private Class<T> objectType;
+        private WsListner listner;
 
-        public Payload(String channel, Class<T> objectType, WsListner listner) {
+        Payload(String channel, Class<T> objectType, WsListner listner) {
             this.channel = channel;
             this.objectType = objectType;
             this.listner = listner;
