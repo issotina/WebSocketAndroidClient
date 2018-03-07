@@ -92,7 +92,7 @@ public class WsImpl implements Ws {
             @Override
             public void onClose(int i, String s) {
                 //force recnnection to web socket
-                Log.i(TAG, "Disconnected; Code " + i);
+                Log.e(TAG, "Disconnected; Code " + i);
 
                 if (i == 1 || i == 3 || i == 2 || i == 4 || i == 5) {
                     mainHandler.removeCallbacks(handleSocketReconnection);
