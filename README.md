@@ -1,4 +1,7 @@
 # WebSocketAndroidClient
+
+[![](https://jitpack.io/v/geeckmc/WebSocketAndroidClient.svg)](https://jitpack.io/#geeckmc/WebSocketAndroidClient)
+
 #### Android webSocket client for [Ratchet Server](http://socketo.me/) 
 Credit : This android library use [Autobahn-java](https://github.com/crossbario/autobahn-java)
 
@@ -16,7 +19,7 @@ Credit : This android library use [Autobahn-java](https://github.com/crossbario/
  ### 2 - Add the dependency
  ```groovy
  dependencies {
-	        compile 'com.github.geeckmc:WebSocketAndroidClient:0.0.4'
+	        compile 'com.github.geeckmc:WebSocketAndroidClient:0.0.7'
 	}
 ```
  
